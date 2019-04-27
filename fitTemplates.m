@@ -76,7 +76,8 @@ fW = conj(fW);
 nspikes = zeros(Nfilt, Nbatch);
 lam =  ones(Nfilt, 1, 'single');
 
-freqUpdate = 100 * 4;
+% freqUpdate = 100 * 4;
+freqUpdate = uint64( getOr(ops, 'freqUpdate', 100*4) );
 iUpdate = 1:freqUpdate:Nbatch;
 
 
@@ -127,7 +128,7 @@ while (i<=Nbatch * ops.nfullpasses+1)
         
         % break bimodal clusters and remove low variance clusters
         if  ops.shuffle_clusters &&...
-                i>Nbatch && rem(rem(i,Nbatch), 4*400)==1    % i<Nbatch*ops.nannealpasses
+                i>Nbatch && rem(rem(i,Nbatch), 4*freqUpdate)==1    % i<Nbatch*ops.nannealpasses
             [dWU, dbins, nswitch, nspikes, iswitch] = ...
                 replace_clusters(dWU, dbins,  Nbatch, ops.mergeT, ops.splitT, WUinit, nspikes);
         end
