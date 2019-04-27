@@ -1,4 +1,3 @@
-
 function [spikeTimes, clusterIDs, amplitudes, templates, templateFeatures, ...
     templateFeatureInds, pcFeatures, pcFeatureInds] = rezToPhy(rez, savePath)
 % pull out results from kilosort's rez to either return to workspace or to
@@ -25,6 +24,12 @@ end
 if exist(fullfile(savePath, '.phy'), 'dir')
     rmdir(fullfile(savePath, '.phy'), 's');
 end
+
+% clean up rez duplicates
+[~,uniqueIdxs,~] = unique(rez.st3,'rows');
+rez.st3 = rez.st3(uniqueIdxs,:);
+rez.cProj = rez.cProj(uniqueIdxs,:);
+rez.cProjPC = rez.cProjPC(uniqueIdxs,:,:);
 
 spikeTimes = uint64(rez.st3(:,1));
 % [spikeTimes, ii] = sort(spikeTimes);
