@@ -11,7 +11,7 @@ function [spikeTimes, clusterIDs, amplitudes, templates, templateFeatures, ...
 outputs = {'amplitudes.npy', 'channel_map.npy', 'channel_positions.npy', 'pc_features.npy', ...
            'pc_feature_ind.npy', 'similar_templates.npy', 'spike_clusters.npy', 'spike_templates.npy', ...
            'spike_times.npy', 'templates.npy', 'templates_ind.npy', 'template_features.npy', ...
-           'template_feature_ind.npy', 'whitening_mat.npy', 'whitening_mat_inv.npy'};
+           'template_feature_ind.npy', 'whitening_mat.npy', 'whitening_mat_inv.npy', 'params.py'};
 
 fs = dir(fullfile(savePath, '*.npy'));
 for i = 1:length(fs)
@@ -115,13 +115,17 @@ if ~isempty(savePath)
         writeNPY(similarTemplates, fullfile(savePath, 'similar_templates.npy'));
     end
     
-     %make params file
+    
+    % Make params file
     if ~exist(fullfile(savePath,'params.py'),'file')
+        % include relative path elements in dat_path
+        [dat_path, fname, ext] = fileparts(rez.ops.fbinary);
+        dat_path = split(dat_path, filesep);
+        dat_path = fullfile( dat_path{find(strcmp(dat_path,'..'),1):end}, [fname ext]);
+        
         fid = fopen(fullfile(savePath,'params.py'), 'w');
-        
-        [~, fname, ext] = fileparts(rez.ops.fbinary);
-        
-        fprintf(fid,['dat_path = ''',fname ext '''\n']);
+        fprintf(fid,['dat_path = ''',dat_path '''\n']);  % locations of binary file, can be relative - e.g. ../file.bin
+        fprintf(fid,['dir_path = ''.',filesep '''\n']);  % location of spike output, '.' means current folder, keeps phy from wandering everywhere
         fprintf(fid,'n_channels_dat = %i\n',rez.ops.NchanTOT);
         fprintf(fid,'dtype = ''int16''\n');
         fprintf(fid,'offset = 0\n');
@@ -133,4 +137,5 @@ if ~isempty(savePath)
         fprintf(fid,'hp_filtered = False');
         fclose(fid);
     end
+
 end
