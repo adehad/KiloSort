@@ -63,8 +63,9 @@ ops.crit            = .65;     		% upper criterion for discarding spike repeates
 ops.nFiltMax        = 10e3;   		% maximum "unique" spikes to consider (10000)		
 		
 % load predefined principal components (visualization only (Phy): used for features)		
-dd                  = load('PCspikes2.mat'); % you might want to recompute this from your own data		
-ops.wPCA            = dd.Wi(:,1:7);   		 % PCs 		
+dd                  = load('PCspikes2.mat'); % Entire PC output	('PCspikes2.mat')	
+ops.centrePC        = 21;                    % (element of spike peak)+1 (21) 		
+ops.wPCA            = dd.Wi(:,1:7);   		 % Take first 7 PCs 		
 		
 % options for posthoc merges (under construction)		
 ops.fracse  = 0.1; % binning step along discriminant axis for posthoc merges (in units of sd)		

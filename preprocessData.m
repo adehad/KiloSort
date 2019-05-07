@@ -2,7 +2,7 @@ function [rez, DATA, uproj] = preprocessData(ops)
 tic;
 uproj = [];
 ops.nt0 	= getOr(ops, {'nt0'}, 61);
-
+ops.centrePC     = getOr(ops, {'centrePC'}, 21);
 
 if strcmp(ops.datatype , 'openEphys')
    ops = convertOpenEphysToRawBInary(ops);  % convert data, only for OpenEphys
@@ -262,7 +262,7 @@ for ibatch = 1:Nbatch
         [row, col, mu] = isolated_peaks(dataRAW, ops.loc_range, ops.long_range, ops.spkTh);
         
         % find their PC projections
-        uS = get_PCproj(dataRAW, row, col, wPCA, ops.maskMaxChannels);
+        uS = get_PCproj(dataRAW, row, col, wPCA, ops.maskMaxChannels, ops.centrePC);
         
         uS = permute(uS, [2 1 3]);
         uS = reshape(uS,numel(row), Nchan * size(wPCA,2));
