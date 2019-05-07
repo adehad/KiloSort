@@ -13,7 +13,7 @@ outputs = {'amplitudes.npy', 'channel_map.npy', 'channel_positions.npy', 'pc_fea
            'spike_times.npy', 'templates.npy', 'templates_ind.npy', 'template_features.npy', ...
            'template_feature_ind.npy', 'whitening_mat.npy', 'whitening_mat_inv.npy', 'params.py'};
 
-fs = dir(fullfile(savePath, '*.npy'));
+fs = dir(fullfile(savePath, '*.*py'));
 for i = 1:length(fs)
     fname = fs(i).name;
     % don't delete .npy files which have nothing to do with us
