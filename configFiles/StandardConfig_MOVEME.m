@@ -55,7 +55,7 @@ ops.splitT           = 1e-3;        % lower threshold for splitting (.1)
 		
 % options for initializing spikes from data		
 ops.initialize      = 'fromData'; 	%'fromData' or 'no'		
-ops.spkTh           = -5;      		% spike threshold in standard deviations (4)		
+ops.spkTh           = -5;      		% spike threshold in standard deviations, KiloSort looks for a minimum peak, so must be negative (-4)		
 ops.loc_range       = [10  1];  	% ranges to detect peaks; plus/minus in time and channel ([3 1])		
 ops.long_range      = [30  6]; 		% ranges to detect isolated peaks ([30 6])		
 ops.maskMaxChannels = 5;       		% how many channels to mask up/down ([5])		
