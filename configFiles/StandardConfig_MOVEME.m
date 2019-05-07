@@ -12,15 +12,15 @@ ops.root                = 'C:\DATA\Spikes\Piroska'; % 'openEphys' only: where ra
 % ops.NchanTOT            = 32;           % total number of channels (omit if already in chanMap file)
 % ops.Nchan               = 32;           % number of active channels (omit if already in chanMap file)
 ops.Nfilt               = 12;             % number of clusters to use (2-4 times more than Nchan, should be a multiple of 32)     		
-ops.nNeighPC            = 12; % visualization only (Phy): number of channnels to mask the PCs, leave empty to skip (12)		
+ops.nNeighPC            = 2; % visualization only (Phy): number of channnels to mask the PCs, leave empty to skip (12)		
 			% must be less than number of channels
-ops.nNeigh              = 16; % visualization only (Phy): number of neighboring templates to retain projections of (16)		
+ops.nNeigh              = 3; % visualization only (Phy): number of neighboring templates to retain projections of (16)		
 			% Must be less than Nfilt 
 
 % options for channel whitening		
 ops.whitening           = 'full'; 	% type of whitening (default 'full', for 'noSpikes' set options for spike detection below)		
 ops.nSkipCov            = 1; 		% compute whitening matrix from every N-th batch (1)		
-ops.whiteningRange      = 32; 		% how many channels to whiten together (Inf for whole probe whitening, should be fine if Nchan<=32)		
+ops.whiteningRange      = 1; 		% how many channels to whiten together (Inf for whole probe whitening, should be fine if Nchan<=32)		
 		
 % define the channel map as a filename (string) or simply an array		
 ops.chanMap             = 'C:\DATA\Spikes\Piroska\chanMap.mat'; % make this file using createChannelMapFile.m		
@@ -63,9 +63,16 @@ ops.crit            = .65;     		% upper criterion for discarding spike repeates
 ops.nFiltMax        = 10e3;   		% maximum "unique" spikes to consider (10000)		
 		
 % load predefined principal components (visualization only (Phy): used for features)		
-dd                  = load('PCspikes2.mat'); % Entire PC output	('PCspikes2.mat')	
+dd                  = load('PCspikes2.mat'); % Entire PC output, ideally compute for your own data	('PCspikes2.mat')	
 ops.centrePC        = 21;                    % (element of spike peak)+1 (21) 		
-ops.wPCA            = dd.Wi(:,1:7);   		 % Take first 7 PCs 		
+ops.wPCA            = dd.Wi(:,1:7);   		 % Take first 7 PCs 	
+ops.saveInitTemps   = 0;                     % if saveInitTemps         ( 0 )
+                                                % true: will try and store initial templates
+                                                % false: load from template initFile ('WUinit.mat')
+ops.initFilePath    = ops.root;              % if saveInitTemps =       ( [] )
+                                                % true: [path to store initial templates, 'WUinit.mat'] to store initial templates
+                                                % false: loads initial templates from [path to store initial templates, 'WUinit.mat']
+% ops.nt0min = ops.centrePC-1;               %  comment out if you have not computed your PC, used in template centering, ideally should be ops.centrePC-1 ()
 		
 % options for posthoc merges (under construction)		
 ops.fracse  = 0.1; % binning step along discriminant axis for posthoc merges (in units of sd)		
