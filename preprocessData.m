@@ -258,8 +258,11 @@ for ibatch = 1:Nbatch
     dataRAW = dataRAW / ops.scaleproc;
     
     if strcmp(ops.initialize, 'fromData') %&& rem(ibatch, 10)==1
+        
+        peakLoc = ops.centrePC-1;
+        postPeakSamples = size(ops.wPCA,1) - ops.centrePC;
         % find isolated spikes
-        [row, col, mu] = isolated_peaks(dataRAW, ops.loc_range, ops.long_range, ops.spkTh);
+        [row, col, mu] = isolated_peaks(dataRAW, ops.loc_range, ops.long_range, ops.spkTh, peakLoc, postPeakSamples);
         
         % find their PC projections
         uS = get_PCproj(dataRAW, row, col, wPCA, ops.maskMaxChannels, ops.centrePC);
