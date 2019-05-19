@@ -53,7 +53,7 @@ ops.freqUpdate       = 200;         % after how many batches, should try split a
 ops.mergeT           = 1e-3;        % upper threshold for merging (.1)		
 ops.splitT           = 1e-3;        % lower threshold for splitting (.1)		
 		
-% options for initializing spikes from data		
+% options for initializing spike templates from data		
 ops.initialize      = 'fromData'; 	%'fromData' or 'no'		
 ops.spkTh           = -5;      		% spike threshold in standard deviations, KiloSort looks for a minimum peak, so must be negative (-4)		
 ops.loc_range       = [10  1];  	% ranges to detect peaks; plus/minus in time and channel ([3 1])		
