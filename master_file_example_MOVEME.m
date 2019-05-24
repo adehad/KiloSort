@@ -5,9 +5,9 @@
 addpath(genpath('D:\CODE\GitHub\KiloSort')) % path to kilosort folder
 addpath(genpath('D:\CODE\GitHub\npy-matlab')) % path to npy-matlab scripts
 
-pathToYourConfigFile = ''; % put masterfile in same folder as config
-                           % ops.root in configfile should be the folder 
-                           % where the masterfile is
+pathToYourConfigFile = '.'; % put masterfile in same folder as config
+                            % ops.root in configfile should be the folder 
+                            % where the masterfile is
 run(fullfile(pathToYourConfigFile, 'StandardConfig_MOVEME.m'))
 
 tic; % start timer
@@ -43,7 +43,19 @@ saveOutput(rez,ops,'pre')
 disp('Done')
 
 % Custom save function
-function saveOutput(rez,ops,preOrPost)
+function saveOutput(rez, ops, preOrPost, linkBinary)
+% EXAMPLE:
+% saveOutput(rez, ops, '', false) [default]
+%   saves output in current folder and does not link the binary
+
+if nargin<3
+    preOrPost = [];
+    linkBinary = false;
+elseif nargin<4
+	linkBinary = false;
+end
+
+rez.linkBinary = boolean(linkBinary); % temporary variable
 
 if strcmpi(preOrPost,'pre')
     runType = 'preAutoMerge';
@@ -51,39 +63,54 @@ if strcmpi(preOrPost,'pre')
 elseif strcmpi(preOrPost,'post')
     runType = 'postAutoMerge';
     rezName = 'rez_post.mat';
+elseif isempty(preOrPost)
+	runType = '';
+	rezName = 'rez.mat';
 else
-    error('Must be ''pre'' or ''post'' ')
+    error('Must be ''pre'' or ''post'' or [] ')
 end
 
 % save matlab results file
 save(fullfile(ops.root,  rezName), 'rez', '-v7.3');
 
 % save python results file for Phy, in a new folder
-mkdir( [ops.root, runType] ) 
-rezToPhy(rez, [ops.root, filesep, runType, filesep]);
+if ~isempty(runType)
+	if strcmpi(ops.root,'') || strcmpi(ops.root,'.')
+		mkdir( runType )
+		whereSave = [runType, filesep];
+	else
+		mkdir( ops.root, runType )
+		whereSave = [ops.root, filesep, runType, filesep];
+	end
+else
+	whereSave = ['.'];
+end
 
+rezToPhy(rez, whereSave);
 
 % To prevent conflicts that arise due to the .phy folder that is
 % created in the same location as the binary file
 % We use the 'link' method, which prevents taking up actual hard drive space
-if ismac        % Code to run on Mac platform
-    fprintf(['Mac currently not supported. To use Phy: \n', ...
-    'Please move the binary file to the folder \n', ...
-    'that you want to visualise \n'])
+if linkBinary
+	if ismac        % Code to run on Mac platform
+	    fprintf(['Mac currently not supported. To use Phy: \n', ...
+	    'Please move the binary file to the folder \n', ...
+	    'that you want to visualise \n'])
 
-elseif isunix    % Code to run on Linux platform
-    command = ['ln',' ',ops.fbinary,' ',runType, filesep, ops.fbinary];
-    [status,cmdout] = system(command);
-    
-elseif ispc      % Code to run on Windows platform
-    command = ['mklink /H',' ', runType, filesep,ops.fbinary,' ',ops.fbinary];
-    [status,cmdout] = system(command);
-    
-else
-    status = -1;
-    cmdout = 'Platform not supported';
-    
+	elseif isunix    % Code to run on Linux platform
+	    command = ['ln',' ',ops.fbinary,' ',runType, filesep, ops.fbinary];
+	    [status,cmdout] = system(command);
+	    
+	elseif ispc      % Code to run on Windows platform
+	    command = ['mklink /H',' ', runType, filesep,ops.fbinary,' ',ops.fbinary];
+	    [status,cmdout] = system(command);
+	    
+	else
+	    status = -1;
+	    cmdout = 'Platform not supported';
+	    
+	end
+	fprintf('Link Status: %i. \n %s',status,cmdout);
 end
-fprintf('Link Status: %i. \n %s',status,cmdout);
 
 end

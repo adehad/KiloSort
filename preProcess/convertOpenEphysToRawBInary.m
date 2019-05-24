@@ -1,11 +1,28 @@
-function ops = convertOpenEphysToRawBInary(ops)
+function ops = convertOpenEphysToRawBInary(ops,rootVar,binaryVar)
+% looks for ops.rootVar (that is the openEphys output folder)
+% looks for ops.binaryVar (that should store the file name to create)
+% EXAMPLE:
+% convertOpenEphysToRawBInary(ops,'OEroot','fbinary') [default]
+% where:
+%   ops.OEroot = 'C:\DATA\Spikes\Piroska';    % some folder
+%   ops.fbinary = 'coolData';               % some string, will make a .dat
+if nargin<2
+    rootVar = 'OEroot';
+    binaryVar = 'fbinary';
+elseif nargin<3
+    binaryVar = 'fbinary';
+end
 
-fname       = fullfile(ops.root, sprintf('%s.dat', ops.fbinary)); 
+% get these variables from the options struct
+rootLoc = ops.(rootVar);
+binaryName = ops.(binaryVar);
+
+fname       = fullfile(rootLoc, sprintf('%s.dat', binaryName)); 
 fidout      = fopen(fname, 'w');
 %
 clear fs
 for j = 1:ops.Nchan
-   fs{j} = dir(fullfile(ops.root, sprintf('*CH%d_*.continuous', j) ));
+   fs{j} = dir(fullfile(rootLoc, sprintf('*CH%d_*.continuous', j) ));
 end
 nblocks = cellfun(@(x) numel(x), fs);
 if numel(unique(nblocks))>1
@@ -20,7 +37,7 @@ fid = cell(ops.Nchan, 1);
 tic
 for k = 1:nBlocks
     for j = 1:ops.Nchan
-        fid{j}             = fopen(fullfile(ops.root, fs{j}(k).name));
+        fid{j}             = fopen(fullfile(rootLoc, fs{j}(k).name));
         % discard header information
         fseek(fid{j}, 1024, 0);
     end
