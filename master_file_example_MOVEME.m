@@ -113,4 +113,8 @@ if linkBinary
 	fprintf('Link Status: %i. \n %s',status,cmdout);
 end
 
+rez = rmfield(rez,'linkBinary'); % remove temporary variable
+% save matlab results file
+save(fullfile(ops.root,  rezName), 'rez', '-v7.3');
+
 end

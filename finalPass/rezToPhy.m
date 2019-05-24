@@ -119,9 +119,8 @@ if ~isempty(savePath)
     % Make params file
     if ~exist(fullfile(savePath,'params.py'),'file')
         % include relative path elements in dat_path
-        if rez.linkBinary
+        if getOr(rez,'linkBinary',false)
             dat_path = rez.ops.fbinary;
-            rez = rmfield(rez,'linkBinary'); % remove temporary variable
         else
             try
                 dat_path = getRelativePath( GetFullPath(rez.ops.fbinary),GetFullPath(savePath) );
