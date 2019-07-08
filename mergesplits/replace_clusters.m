@@ -1,5 +1,5 @@
 function [dWUtot, dbins, nswitch, nspikes, iYout] = ...
-    replace_clusters(dWUtot,dbins, Nbatch, mergeT, splitT,  WUinit, nspikes)
+    replace_clusters(dWUtot,dbins, Nbatch, mergeT, splitT,  WUinit, nspikes, muTh, minSpks)
 
 uu = Nbatch * dbins;
 nhist = 1:1:100;
@@ -18,7 +18,7 @@ nsplit = sum(score>splitT);
 mu = sum(sum(dWUtot.^2,1),2).^.5;
 mu = mu(:);
 % freeInd = find(nSpikes<200 | mu'<10 | isnan(mu'));
-freeInd = find(nSpikes<20 | mu'<10 | isnan(mu'));
+freeInd = find(nSpikes<minSpks | mu'<muTh | isnan(mu'));
 
 for k = 1:nmerged
     % merge the two clusters

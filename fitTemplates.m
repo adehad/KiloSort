@@ -81,8 +81,14 @@ freqUpdate = uint64( getOr(ops, 'freqUpdate', 100*4) );
 iUpdate = 1:freqUpdate:Nbatch;
 
 
+muTh    = double( getOr(ops, 'muTh', 10) );         % minimum mu allowed per unit
+minSpks = double( getOr(ops, 'minSpks', 200) );     % minimum number of spikes allowed per unit
+
+
 dbins = zeros(100, Nfilt);
 dsum = 0;
+forgetFac = double( getOr(ops, 'forgetFac', 0.9975) );     % dbins forgetful factor
+
 miniorder = repmat(iperm, 1, ops.nfullpasses);
 %     miniorder = repmat([1:Nbatch Nbatch:-1:1], 1, ops.nfullpasses/2);
 
@@ -130,7 +136,8 @@ while (i<=Nbatch * ops.nfullpasses+1)
         if  ops.shuffle_clusters &&...
                 i>Nbatch && rem(rem(i,Nbatch), 4*freqUpdate)==1    % i<Nbatch*ops.nannealpasses
             [dWU, dbins, nswitch, nspikes, iswitch] = ...
-                replace_clusters(dWU, dbins,  Nbatch, ops.mergeT, ops.splitT, WUinit, nspikes);
+                replace_clusters(dWU, dbins,  Nbatch, ops.mergeT, ops.splitT, WUinit, nspikes, ...
+                                 muTh, minSpks);
         end
         
         dWU = alignWU(dWU, ops);
@@ -215,7 +222,7 @@ while (i<=Nbatch * ops.nfullpasses+1)
             mexMPregMUcpu(Params,dataRAW,fW,data,UtU,mu, lam .* (20./mu).^2, dWU, nu, ops);
     end
     
-    dbins = .9975 * dbins;  % this is a hard-coded forgetting factor, needs to become an option
+    dbins = forgetFac * dbins;  % apply forgetful factor
     if ~isempty(id)
         % compute numbers of spikes
         nsp                = gather_try(nsp(:));
@@ -254,5 +261,5 @@ if ~ops.GPU
    rez.fW = fW; % save fourier space templates if on CPU
 end
 rez.dWU               = gather_try(dWU);
-rez.nspikes               = nspikes;
+rez.nspikes           = nspikes;
 % %%

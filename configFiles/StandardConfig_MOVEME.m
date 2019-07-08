@@ -53,6 +53,9 @@ ops.shuffle_clusters = 1;           % allow merges and splits during optimizatio
 ops.freqUpdate       = 200;         % after how many batches, should try split and merge (400)	
 ops.mergeT           = 1e-3;        % upper threshold for merging (.1)		
 ops.splitT           = 1e-3;        % lower threshold for splitting (.1)		
+ops.muTh             = 15;          % minimum mu ("variance") required per cluster (10)
+ops.minSpks          = 200;         % minimum number of spikes allowed per cluster (200)
+ops.forgetFac        = 0.9975;      % dbins forgetful factor (0.9975)
 		
 % options for initializing spike templates from data		
 ops.initialize      = 'fromData'; 	%'fromData' or 'no'		
