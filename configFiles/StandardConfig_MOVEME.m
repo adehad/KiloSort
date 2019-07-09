@@ -6,7 +6,7 @@ ops.showfigures         = 0; % whether to plot figures during optimization
 ops.datatype            = 'dat';  % binary ('dat', 'bin') or 'openEphys'		
 ops.fbinary             = 'C:\DATA\Spikes\Piroska\piroska_example_short.dat'; % will be created for 'openEphys'		
 ops.fproc               = 'C:\DATA\Spikes\Piroska\temp_wh.dat'; % residual from RAM of preprocessed data		
-ops.root                = pathToYourConfigFile; % we use a custom 'openEphys' converter
+ops.root                = [pathToYourConfigFile,filesep]; % we use a custom 'openEphys' converter
 % ops.OEroot              = 'C:\DATA\Spikes\Piroska'; % 'openEphys' only: where raw files are		
 		
 % ops.fs                  = 25000;        % sampling rate		(omit if already in chanMap file)

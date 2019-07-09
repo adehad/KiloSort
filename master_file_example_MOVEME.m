@@ -5,7 +5,7 @@
 addpath(genpath('D:\CODE\GitHub\KiloSort')) % path to kilosort folder
 addpath(genpath('D:\CODE\GitHub\npy-matlab')) % path to npy-matlab scripts
 
-pathToYourConfigFile = '.'; % put masterfile in same folder as config
+pathToYourConfigFile = pwd; % put masterfile in same folder as config
                             % ops.root in configfile should be the folder 
                             % where the masterfile is
 run(fullfile(pathToYourConfigFile, 'StandardConfig_MOVEME.m'))
@@ -55,7 +55,7 @@ elseif nargin<4
 	linkBinary = false;
 end
 
-rez.linkBinary = boolean(linkBinary); % temporary variable
+rez.linkBinary = logical(linkBinary); % temporary variable
 
 if strcmpi(preOrPost,'pre')
     runType = 'preAutoMerge';
