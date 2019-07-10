@@ -260,8 +260,12 @@ if Nbatch_buff<Nbatch
 end
 
 % center the templates
-rez.W               = cat(1, zeros(nt0 - (ops.nt0-1-ops.nt0min), Nfilt, Nrank), rez.W);
-rez.WrotInv         = (rez.Wrot/200)^-1;
+% rez.W               = cat(1, zeros(nt0 - (ops.nt0-1-ops.nt0min), Nfilt, Nrank), rez.W);
+padBuff = zeros(2*nt0-1,Nfilt,Nrank);
+padBuff( round((2*nt0-1)/2 -ops.nt0min):(round((2*nt0-1)/2 -ops.nt0min) + size(rez.W,1)-1 ) ,:,:) = rez.W;
+rez.W = padBuff;
+clear padBuff;
+rez.WrotInv         = (rez.Wrot/ops.scaleproc)^-1;
 %%
 Urot = U;
 for k = 1:size(U,3)

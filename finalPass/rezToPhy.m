@@ -1,5 +1,5 @@
 function [spikeTimes, clusterIDs, amplitudes, templates, templateFeatures, ...
-    templateFeatureInds, pcFeatures, pcFeatureInds] = rezToPhy(rez, savePath)
+    templateFeatureInds, pcFeatures, pcFeatureInds] = rezToPhy(rez, savePath, varargin)
 % pull out results from kilosort's rez to either return to workspace or to
 % save in the appropriate format for the phy GUI to run on. If you provide
 % a savePath it should be a folder, and you will need to have npy-matlab
@@ -105,7 +105,7 @@ if ~isempty(savePath)
     writeNPY(pcFeatures, fullfile(savePath, 'pc_features.npy'));
     writeNPY(pcFeatureInds'-1, fullfile(savePath, 'pc_feature_ind.npy'));% -1 for zero indexing
     
-    whiteningMatrix = rez.Wrot/200;
+    whiteningMatrix = rez.Wrot/rez.ops.scaleproc;
     whiteningMatrixInv = whiteningMatrix^-1;
     writeNPY(whiteningMatrix, fullfile(savePath, 'whitening_mat.npy'));
     writeNPY(whiteningMatrixInv, fullfile(savePath, 'whitening_mat_inv.npy'));
