@@ -7,6 +7,26 @@ function [spikeTimes, clusterIDs, amplitudes, templates, templateFeatures, ...
 %
 % spikeTimes will be in samples, not seconds
 
+if ~isempty(varargin)
+    saveName = string(varargin{1});
+    matSave = true;
+    o = struct; % output variables stored into this struct
+    o.idxOffset = -1; % default is Python style 0-indexing
+    
+    if length(varargin)>1
+        switch varargin{2}
+            case 0
+                o.idxOffset = -1;
+            case 1
+                o.idxOffset = 0;
+            otherwise
+                warning('Last argument is 0 or 1, for 0 indexing (Python) or 1 indexing (MATLAB). Defaulting to Python')
+                o.idxOffset = -1; 
+        end
+    end
+else
+    matSave = false;
+end
 
 outputs = {'amplitudes.npy', 'channel_map.npy', 'channel_positions.npy', 'pc_features.npy', ...
            'pc_feature_ind.npy', 'similar_templates.npy', 'spike_clusters.npy', 'spike_templates.npy', ...
@@ -82,11 +102,13 @@ if ~isempty(savePath)
     
     writeNPY(spikeTimes, fullfile(savePath, 'spike_times.npy'));
     writeNPY(uint32(spikeTemplates-1), fullfile(savePath, 'spike_templates.npy')); % -1 for zero indexing
-    if size(rez.st3,2)>4
-        writeNPY(int32(spikeClusters-1), fullfile(savePath, 'spike_clusters.npy')); % -1 for zero indexing
+    if size(rez.st3,2)>4                            
+        spike_clusters = int32(spikeClusters-1);    % -1 for zero indexing
     else
-        writeNPY(int32(spikeTemplates-1), fullfile(savePath, 'spike_clusters.npy')); % -1 for zero indexing
+        spike_clusters = int32(spikeTemplates-1);   % -1 for zero indexing
     end
+    writeNPY(spike_clusters, fullfile(savePath, 'spike_clusters.npy')); 
+    
     writeNPY(amplitudes, fullfile(savePath, 'amplitudes.npy'));
     writeNPY(templates, fullfile(savePath, 'templates.npy'));
     writeNPY(templatesInds, fullfile(savePath, 'templates_ind.npy'));
@@ -110,14 +132,35 @@ if ~isempty(savePath)
     writeNPY(whiteningMatrix, fullfile(savePath, 'whitening_mat.npy'));
     writeNPY(whiteningMatrixInv, fullfile(savePath, 'whitening_mat_inv.npy'));
     
+    if matSave      % NOTE: Using 0-indexing
+        o.spike_times = spikeTimes;
+        o.spike_templates = uint32(spikeTemplates-1);
+        o.amplitudes = amplitudes;
+        o.templates = templates;
+        o.templates_ind = templatesInds;
+        o.channel_map = chanMap0ind(conn);
+        o.channel_positions = [xcoords(conn) ycoords(conn)];
+        o.template_features = templateFeatures;
+        o.template_feature_ind = templateFeatureInds'-1;
+        o.pc_features = pcFeatures;
+        o.pc_feature_ind = pcFeatureInds'-1;
+        o.whitening_mat = whiteningMatrix;
+        o.whitening_mat_inv = whiteningMatrixInv;
+    end
+    
     if isfield(rez, 'simScore')
         similarTemplates = rez.simScore;
         writeNPY(similarTemplates, fullfile(savePath, 'similar_templates.npy'));
+        
+        if matSave
+           o.similar_templates = similarTemplates; 
+        end
+        
     end
     
     
     % Make params file
-    if ~exist(fullfile(savePath,'params.py'),'file')
+%     if ~exist(fullfile(savePath,'params.py'),'file')
         % include relative path elements in dat_path
         if getOr(rez,'linkBinary',false)
             dat_path = rez.ops.fbinary;
@@ -133,7 +176,7 @@ if ~isempty(savePath)
         end
         
         dat_path = replace(dat_path, '\', '/'); % / is the preferred file separator (stops frprintf conflicts on Windows)
-        
+                
         fid = fopen(fullfile(savePath,'params.py'), 'w');
         fprintf(fid,['dat_path = ''',dat_path '''\n']);  % locations of binary file, can be relative - e.g. ../file.bin
         fprintf(fid,['dir_path = ''.',filesep '''\n']);  % location of spike output, '.' means current folder, keeps phy from wandering everywhere
@@ -147,8 +190,24 @@ if ~isempty(savePath)
         end
         fprintf(fid,'hp_filtered = False');
         fclose(fid);
-    end
+        
+        if matSave
+           o.params.dat_path = dat_path; 
+           o.params.n_channels_dat = rez.ops.NchanTOT;
+           o.params.dtype = 'int16';
+           o.params.sample_rate = rez.ops.fs;
+        end
+        
+%     end
 
+    if matSave
+        try
+            save(savePath+saveName,'-v7','-struct','o') % v7 is smaller in size
+        catch
+            save(savePath+saveName,'-v7.3','-struct','o')
+        end
+    end
+        
 else
     warning(['Empty path specified, skipping save.', newline, ...
             'To save in current folder provide ''.'' as the path', newline, ...
