@@ -96,6 +96,7 @@ end
 if ~isempty(ops.nNeighPC)
     nNeighPC  = ops.nNeighPC;
     load PCspikes
+    % load('PCspikes.mat','Wi');
     ixt = round(linspace(1, size(Wi,1), ops.nt0));
     Wi = Wi(ixt, 1:3);
     rez.cProjPC = zeros(5e6, 3*nNeighPC, 'single');
@@ -180,7 +181,7 @@ for ibatch = 1:Nbatch
         % increment number of spikes
         irun            = irun + numel(st);
         
-        if ibatch==1;
+        if ibatch==1
             ioffset         = 0;
         else
             ioffset         = ops.ntbuff;

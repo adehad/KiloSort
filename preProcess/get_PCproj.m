@@ -16,3 +16,6 @@ Us = wPCA' * reshape(clips, numel(dt), []);
 Us = reshape(Us, size(wPCA,2), numel(row), nChan);
 
 Us = permute(Us, [3 2 1]);
+
+% figure; plot(sq(gather(clips(:,:,1)))) 
+% plots waveforms as seen from 1st channel

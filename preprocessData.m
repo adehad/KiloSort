@@ -4,6 +4,8 @@ uproj = [];
 ops.nt0 	= getOr(ops, {'nt0'}, 61);
 ops.centrePC     = getOr(ops, {'centrePC'}, 21);
 
+ops.maxSpkPeaks = getOr(ops, {'maxSpkPeaks'}, 1);
+
 if strcmp(ops.datatype , 'openEphys')
    ops = convertOpenEphysToRawBInary(ops);  % convert data, only for OpenEphys
 end
@@ -262,7 +264,7 @@ for ibatch = 1:Nbatch
         peakLoc = ops.centrePC-1;
         postPeakSamples = size(ops.wPCA,1) - ops.centrePC;
         % find isolated spikes
-        [row, col, mu] = isolated_peaks(dataRAW, ops.loc_range, ops.long_range, ops.spkTh, peakLoc, postPeakSamples);
+        [row, col, mu] = isolated_peaks(dataRAW, ops.loc_range, ops.long_range, ops.spkTh, peakLoc, postPeakSamples, maxSpkPeaks);
         
         % find their PC projections
         uS = get_PCproj(dataRAW, row, col, wPCA, ops.maskMaxChannels, ops.centrePC);
