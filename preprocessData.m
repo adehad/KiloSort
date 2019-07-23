@@ -5,7 +5,7 @@ ops.nt0 	= getOr(ops, {'nt0'}, 61);
 ops.centrePC     = getOr(ops, {'centrePC'}, 21);
 
 ops.maxSpkPeaks = getOr(ops, {'maxSpkPeaks'}, 1);
-maxSpkPeaks = ops.maxSpkPeak;
+maxSpkPeaks = ops.maxSpkPeaks;
 
 
 if strcmp(ops.datatype , 'openEphys')
