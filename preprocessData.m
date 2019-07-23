@@ -5,6 +5,8 @@ ops.nt0 	= getOr(ops, {'nt0'}, 61);
 ops.centrePC     = getOr(ops, {'centrePC'}, 21);
 
 ops.maxSpkPeaks = getOr(ops, {'maxSpkPeaks'}, 1);
+maxSpkPeaks = ops.maxSpkPeak;
+
 
 if strcmp(ops.datatype , 'openEphys')
    ops = convertOpenEphysToRawBInary(ops);  % convert data, only for OpenEphys
